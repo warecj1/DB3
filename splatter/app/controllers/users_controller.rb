@@ -49,7 +49,46 @@ class UsersController < ApplicationController
   end
 	private
 
-def user_params(params)
-params.permit(:email, :password, :name, :blurb)
-end
+  def user_params(params)
+	params.permit(:email, :password, :name, :blurb)
+  end
+
+  def splatts
+	@user = User.find(params[:id])
+	render json: @user.splatts
+  end
+
+  def show_follows
+	@user = User.find(params[:id])
+	render json: @user.follows
+  end
+
+  def show_followers
+	@user = User.find(params[:id])
+	render json: @user.followed_by
+  end
+
+  def add_follows
+	#params[:id] is user following
+	#params[:follows_id] is user to be folllowed
+
+	#make follower
+	@follower = User.find(params[:id])
+	#make followed
+	@followed = User.find(params[:follows_id])
+	if
+	@follower.follows << @followed
+	else
+	render json: @followererrors
+  end
+
+  def delete_follows
+	@follower = User.find(params[:id])
+	@followed = User.find(params[:follows_id])
+	if
+	@follower.follows.delete(followed)
+	else
+	render json: @followererrors
+
+  end
 end
