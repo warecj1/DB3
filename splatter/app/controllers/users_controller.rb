@@ -1,4 +1,4 @@
-class UsersController < ApplicationController
+ class UsersController < ApplicationController
   # GET /users
   # GET /users.json
   def index
@@ -42,23 +42,28 @@ class UsersController < ApplicationController
   # DELETE /users/1
   # DELETE /users/1.json
   def destroy
-    @user = User.find(params[:id])
-    @user.destroy
+
+  	@user = User.find(params[:id])
+  	@user.destroy
 
     head :no_content
   end
 
   def splatts
+
 	@user = User.find(params[:id])
+
 	render json: @user.splatts
   end
 
   def show_follows
+
 	@user = User.find(params[:id])
 	render json: @user.follows
   end
 
   def show_followers
+
 	@user = User.find(params[:id])
 	render json: @user.followed_by
   end
@@ -71,26 +76,28 @@ class UsersController < ApplicationController
 	@follower = User.find(params[:id])
 	#make followed
 	@followed = User.find(params[:follows_id])
-	if
-	  @follower.follows << @followed
-	else
-	  render json: @followererrors
+		if
+	 	   @follower.follows << @followed
+		else
+	  	   render json: @followererrors
     end
   end
 
   def delete_follows
+
 	@follower = User.find(params[:id])
 	@followed = User.find(params[:follows_id])
-	if
-	  @follower.follows.delete(followed)
-	else
-	  render json: @followererrors
+		if
+	  	  @follower.follows.delete(followed)
+		else
+	  	  render json: @followererrors
 
     end
   end
 
   #GET /users/splatts-feed/1
   def splatts_feed
+
 	@feed = Splatt.find_by_sql("select user_id, body from splatts
 	join follows
 	on follows.followed_id = splatts.user_id
