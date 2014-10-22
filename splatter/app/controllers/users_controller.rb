@@ -18,7 +18,7 @@
   # POST /users
   # POST /users.json
   def create
-    @user = User.new(user_params(params[:user]))
+    @user = User.new(user_params(params))
 
 	    if @user.save
  		render json: @user, status: :created, location: @user
@@ -32,7 +32,7 @@
   def update
     @user = User.find(params[:id])
 
-   	 if @user.update(user_params(params[:user]))
+   	 if @user.update(user_params(params))
      	    head :no_content
    	 else
    	   render json: @user.errors, status: :unprocessable_entity
@@ -69,30 +69,25 @@
   end
 
   def add_follows
-	#params[:id] is user following
-	#params[:follows_id] is user to be folllowed
-
-	#make follower
-	@follower = User.find(params[:id])
-	#make followed
-	@followed = User.find(params[:follows_id])
-		if
-	 	   @follower.follows << @followed
-		else
-	  	   render json: @followererrors
-    end
+	@user = User.find(params[:id])
+	@follows = User.find(params[:follows_id])
+	if @user.follows << @follows and @follows.followers << @user
+		render json: @user.follows
+	else
+		render json: @user.errors, status: :unprocessable_entity
+	end
   end
 
   def delete_follows
 
-	@follower = User.find(params[:id])
-	@followed = User.find(params[:follows_id])
-		if
-	  	  @follower.follows.delete(followed)
-		else
-	  	  render json: @followererrors
+	@user = User.find(params[:id])
+        @follows = User.find(params[:follows_id])
+        if @user.follows << @follows and @follows.followers << @user
+                render json: @user.follows
+        else
+                render json: @user.errors, status: :unprocessable_entity
+        end
 
-    end
   end
 
   #GET /users/splatts-feed/1
@@ -106,10 +101,30 @@
 
 	render json: @feed
   end
+	        def splattCounter
+                map = %Q{ function() {
+                var length = 0;
+                if(this.splatts) {
+                        length = this.splatts.length
+                }
+                emit ("count", length);
+        }
+        }
+                reduce = %Q{ function(key, val) {
+                var data = 0;
+                val.forEach(function(v) {
+                        data += v;
+                })
+                return data;
+        }
+        }
+                User.map_reduce(map.reduce).out(inline: true)
+        end
 
 private
 
   def user_params(params)
 	params.permit(:email, :passsword, :name, :blurb)
   end
+
 end
